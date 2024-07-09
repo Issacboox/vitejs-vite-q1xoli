@@ -1,18 +1,22 @@
 import React from 'react';
-import { Box, CssBaseline, ThemeProvider, Typography, AppBar, Toolbar } from '@mui/material';
+import {
+  Box,
+  CssBaseline,
+  ThemeProvider,
+  Typography,
+  AppBar,
+  Toolbar,
+} from '@mui/material';
 import { theme } from './theme';
 import ShoppingCart from './components/ShoppingCart';
-import { CartItem, mockCartItems } from './types/index';
+import { CartItem } from './types/index';
 import useLocalStorage from './hooks/useLocalStorage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   // Initialize cart items from localStorage or mock data
-  const [cartItems, setCartItems] = useLocalStorage<CartItem[]>(
-    'cartItems',
-    mockCartItems
-  );
+  const [cartItems, setCartItems] = useLocalStorage<CartItem[]>('cartItems', []);
 
   const addToCart = (item: CartItem) => {
     const itemExists = cartItems.find((cartItem) => cartItem.id === item.id);
@@ -45,12 +49,12 @@ function App() {
     <Box sx={{ flexGrow: 1 }}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <AppBar position="static" elevation={0} color="inherit">
+        <AppBar position="sticky" color="inherit">
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1, textTransform: 'uppercase', color: 'black', fontFamily: 'JetBrains Mono, monospace' }}>
               Test Metanet
             </Typography>
-            <Typography variant="body2" color="inherit" style={{fontFamily: 'JetBrains Mono, monospace' }}>
+            <Typography variant="body2" color="inherit" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
               NURARAT S. 🙋🏻‍♀️
             </Typography>
           </Toolbar>
@@ -63,7 +67,7 @@ function App() {
             removeFromCart={removeFromCart}
           />
           <Box sx={{ mt: 'auto', pt: 4, textAlign: 'center' }}>
-            <Typography variant="body2" color="textSecondary" style={{fontFamily: 'JetBrains Mono, monospace' }}>
+            <Typography variant="body2" color="textSecondary" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
               NURARAT S. 🙋🏻‍♀️
             </Typography>
           </Box>
@@ -75,7 +79,6 @@ function App() {
 }
 
 export default App;
-
 
 /*
 Create a shopping cart component using React hooks and TypeScript.

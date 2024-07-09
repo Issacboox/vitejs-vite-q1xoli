@@ -22,7 +22,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const ShoppingCart: React.FC = () => {
-  const [cartItems, setCartItems] = useLocalStorage<Product[]>('cartItems', []);
+  const [cartItems] = useLocalStorage<Product[]>('cartItems', []);
   const [cartState, dispatch] = useReducer(cartReducer, initialState);
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -46,7 +46,7 @@ const ShoppingCart: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (cartItems.length > 0) {
+    if (cartItems && cartItems.length > 0) {
       dispatch({
         type: ActionType.INIT_CART_FROM_LOCAL_STORAGE,
         payload: cartItems,
@@ -57,24 +57,23 @@ const ShoppingCart: React.FC = () => {
   const undo = () => {
     if (currentHistoryIndex > 0) {
       const previousIndex = currentHistoryIndex - 1;
-      const previousState = pastStates[previousIndex];
-      dispatch({ type: ActionType.UNDO, payload: previousState });
+      dispatch({ type: ActionType.UNDO }); // Remove payload
       setCurrentHistoryIndex(previousIndex);
       setFutureStates([cartState, ...futureStates]);
     }
   };
-
+  
   const redo = () => {
     if (currentHistoryIndex < pastStates.length - 1) {
       const nextIndex = currentHistoryIndex + 1;
-      const nextState = pastStates[nextIndex];
-      dispatch({ type: ActionType.REDO, payload: nextState });
+      dispatch({ type: ActionType.REDO }); // Remove payload
       setCurrentHistoryIndex(nextIndex);
       setPastStates([...pastStates, cartState]);
     }
   };
+  
 
-  const addToCart = (product) => {
+  const addToCart = (product: Product) => {
     const cartProduct = cartState.find((item) => item.id === product.id);
   
     if (cartProduct && cartProduct.quantity >= product.quantities) {
@@ -237,7 +236,6 @@ const ShoppingCart: React.FC = () => {
 
                     <CardActions sx={{ justifyContent: 'flex-end' }}>
                       <Button
-                        variant=""
                         style={{ backgroundColor: 'white', color: 'black' }}
                         onClick={() => addToCart(product)}
                       >
@@ -267,7 +265,6 @@ const ShoppingCart: React.FC = () => {
                 style={{
                   textAlign: 'center',
                   textTransform: 'uppercase',
-                  textAlign: 'center',
                   fontWeight: 'bold',
                   fontFamily: 'JetBrains Mono, monospace',
                 }}
