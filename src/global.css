@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+body {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* global.css */
+
+/* Minimal scrollbar styling */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.1);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+/* Nicer pointer styling */
+body {
+  cursor: url('https://example.com/path-to-your-cursor-image.cur'), auto;
+}
+
+a, button {
+  cursor: pointer;
+}
+
+a:hover, button:hover {
+  cursor: url('https://example.com/path-to-your-cursor-image-hover.cur'), pointer;
+}
