@@ -12,9 +12,9 @@ import {
   CardMedia,
 } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import CartItem from './CartItem';
-import { Product, productsData } from '../types';
-import useLocalStorage from '../hooks/useLocalStorage';
+import CartItems from './CartItem';
+import { Product, CartItem, productsData } from '../types';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 import cartReducer, { ActionType, initialState } from '../reducers/cartReducer';
 import { debounce } from '../utils/debounce';
 import Swal from 'sweetalert2';
@@ -22,14 +22,14 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const ShoppingCart: React.FC = () => {
-  const [cartItems] = useLocalStorage<Product[]>('cartItems', []);
+  const [cartItems, setCartItems] = useLocalStorage<CartItem[]>('cartItems', []);
   const [cartState, dispatch] = useReducer(cartReducer, initialState);
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0);
-  const [pastStates, setPastStates] = useState<Product[][]>([]);
-  const [futureStates, setFutureStates] = useState<Product[][]>([]);
+  const [pastStates, setPastStates] = useState<CartItem[][]>([]);
+  const [futureStates, setFutureStates] = useState<CartItem[][]>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -41,7 +41,6 @@ const ShoppingCart: React.FC = () => {
         console.error('Error fetching products:', error);
       }
     };
-
     fetchProducts();
   }, []);
 
@@ -54,29 +53,9 @@ const ShoppingCart: React.FC = () => {
     }
   }, [cartItems]);
 
-  const undo = () => {
-    if (currentHistoryIndex > 0) {
-      const previousIndex = currentHistoryIndex - 1;
-      dispatch({ type: ActionType.UNDO }); // Remove payload
-      setCurrentHistoryIndex(previousIndex);
-      setFutureStates([cartState, ...futureStates]);
-    }
-  };
-  
-  const redo = () => {
-    if (currentHistoryIndex < pastStates.length - 1) {
-      const nextIndex = currentHistoryIndex + 1;
-      dispatch({ type: ActionType.REDO }); // Remove payload
-      setCurrentHistoryIndex(nextIndex);
-      setPastStates([...pastStates, cartState]);
-    }
-  };
-  
-
   const addToCart = (product: Product) => {
     const cartProduct = cartState.find((item) => item.id === product.id);
-  
-    if (cartProduct && cartProduct.quantity >= product.quantities) {
+    if (cartProduct && cartProduct.quantity >= product.stock) {
       Swal.fire({
         html: `<img src="https://assets-v2.lottiefiles.com/a/b5641ed8-1152-11ee-ada0-8f4e8e17569e/AVXn9ghicT.gif" style="width: 170px;">
                <div style="font-family: 'JetBrains Mono', monospace; margin-top: 10px;">
@@ -87,12 +66,12 @@ const ShoppingCart: React.FC = () => {
       });
       return;
     }
-  
-    dispatch({ type: ActionType.ADD_TO_CART, payload: product });
+
+    dispatch({ type: ActionType.ADD_TO_CART, payload: { ...product, stock: 1 } });
     setPastStates([...pastStates, cartState]);
     setCurrentHistoryIndex(currentHistoryIndex + 1);
     setFutureStates([]);
-  
+
     toast.success('Added to cart successfully!', {
       position: 'top-right',
       autoClose: 3000,
@@ -146,39 +125,39 @@ const ShoppingCart: React.FC = () => {
   return (
     <Container maxWidth="lg">
       <Box sx={{ my: 4 }}>
-      <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'left',
-        marginBottom: '20px',
-      }}
-    >
-      <Typography 
-        variant="subtitle1" 
-        sx={{ 
-          fontFamily: 'JetBrains Mono, monospace',
-          marginBottom: '8px' 
-        }}
-      >
-        Search
-      </Typography>
-      <TextField
-        label=""
-        variant="standard"
-        value={searchTerm}
-        onChange={handleSearchChange}
-        fullWidth
-        sx={{
-          width: '300px',
-          borderRadius: '20px',
-          '& .MuiOutlinedInput-root': {
-            borderRadius: '20px',
-            fontFamily: 'JetBrains Mono, monospace'
-          },
-        }}
-      />
-    </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'left',
+            marginBottom: '20px',
+          }}
+        >
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontFamily: 'JetBrains Mono, monospace',
+              marginBottom: '8px'
+            }}
+          >
+            Search
+          </Typography>
+          <TextField
+            label=""
+            variant="standard"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            fullWidth
+            sx={{
+              width: '300px',
+              borderRadius: '20px',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '20px',
+                fontFamily: 'JetBrains Mono, monospace'
+              },
+            }}
+          />
+        </Box>
         <Grid container spacing={3} sx={{ rowGap: '20px' }}>
           {/* Products Grid */}
           <Grid item xs={12} md={8}>
@@ -217,7 +196,6 @@ const ShoppingCart: React.FC = () => {
                         color="text.secondary"
                         style={{ fontFamily: 'JetBrains Mono, monospace' }}
                       >
-                        $
                         {product.price.toLocaleString('en-US', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
@@ -226,11 +204,11 @@ const ShoppingCart: React.FC = () => {
                       <Typography
                         variant="body2"
                         style={{
-                          color: product.quantities < 10 ? 'red' : 'inherit',
+                          color: product.stock < 10 ? 'red' : 'inherit',
                           fontFamily: 'JetBrains Mono, monospace',
                         }}
                       >
-                        stock : {product.quantities}
+                        stock : {product.stock}
                       </Typography>
                     </CardContent>
 
@@ -305,7 +283,7 @@ const ShoppingCart: React.FC = () => {
                     }}
                   >
                     {cartState.map((product) => (
-                      <CartItem
+                      <CartItems
                         key={product.id}
                         product={product}
                         updateQuantity={updateQuantity}
@@ -349,40 +327,6 @@ const ShoppingCart: React.FC = () => {
                       style={{ fontFamily: 'JetBrains Mono, monospace' }}
                     >
                       Clear Cart
-                    </Button>
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      width: '100%',
-                    }}
-                  >
-                    {/* Undo button */}
-                    <Button
-                      onClick={undo}
-                      disabled={currentHistoryIndex <= 0}
-                      sx={{
-                        flex: '6',
-                        marginRight: '5px',
-                        fontFamily: 'JetBrains Mono, monospace',
-                      }}
-                    >
-                      Undo
-                    </Button>
-
-                    {/* Redo button */}
-                    <Button
-                      onClick={redo}
-                      disabled={currentHistoryIndex >= pastStates.length - 1}
-                      sx={{
-                        flex: '6',
-                        marginLeft: '5px',
-                        fontFamily: 'JetBrains Mono, monospace',
-                      }}
-                    >
-                      Redo
                     </Button>
                   </Box>
                 </>

@@ -17,27 +17,30 @@ type CartItemProps = {
   removeFromCart: (id: number) => void;
 };
 
-const CartItem: React.FC<CartItemProps> = ({
+const CartItems: React.FC<CartItemProps> = ({
   product,
   updateQuantity,
   removeFromCart,
 }) => {
+  const defaultQuantity = product.quantity ?? 0; // Default to 0 if quantity is undefined
+
   const incrementQuantity = () => {
-    const newQuantity = Math.min(product.quantities + 1, product.quantities);
+    const newQuantity = Math.min(defaultQuantity + 1, product.stock); // Increment quantity, respecting stock limit
     updateQuantity(product.id, newQuantity);
   };
 
   const decrementQuantity = () => {
-    const newQuantity = Math.max(1, product.quantities - 1); // Ensure quantity doesn't go below 1
+    const newQuantity = Math.max(defaultQuantity - 1, 1); // Decrement quantity, ensuring it doesn't go below 1
     updateQuantity(product.id, newQuantity);
   };
 
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     let newQuantity = parseInt(event.target.value, 10);
-    // Validate against product quantities
-    newQuantity = Math.min(newQuantity, product.quantities);
-    // Ensure quantity doesn't go below 1
-    newQuantity = Math.max(1, newQuantity);
+    if (isNaN(newQuantity)) {
+      newQuantity = 1; // Default to 1 if input is not a number
+    }
+    newQuantity = Math.min(newQuantity, product.stock); // Ensure quantity doesn't exceed stock
+    newQuantity = Math.max(1, newQuantity); // Ensure quantity doesn't go below 1
     updateQuantity(product.id, newQuantity);
   };
 
@@ -58,9 +61,11 @@ const CartItem: React.FC<CartItemProps> = ({
         alt={product.name}
       />
       <CardContent sx={{ flex: '1 0 auto' }}>
-        <Typography variant="h6" style={{ fontFamily: 'JetBrains Mono, monospace',fontSize:'1rem' }}>{product.name}</Typography>
+        <Typography variant="h6" style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '1rem' }}>
+          {product.name}
+        </Typography>
         <Typography variant="body2" color="text.secondary" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-          ${product.price.toFixed(2)}
+          {product.price.toFixed(0)} Baht
         </Typography>
         <Box
           sx={{ display: 'flex', alignItems: 'center', marginTop: '5px' }}
@@ -84,8 +89,8 @@ const CartItem: React.FC<CartItemProps> = ({
             type="number"
             inputProps={{
               min: 1, // Set min directly in inputProps
-              max: product.quantities,
-              value: product.quantities,
+              max: product.stock,
+              value: defaultQuantity, // Use defaultQuantity here
               onChange: handleQuantityChange,
               style: {
                 width: '45px',
@@ -140,4 +145,4 @@ const CartItem: React.FC<CartItemProps> = ({
   );
 };
 
-export default CartItem;
+export default CartItems;

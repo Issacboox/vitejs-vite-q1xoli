@@ -7,5 +7,11 @@
     {
       "path": "./tsconfig.node.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "noUnusedLocals": false, // Set to false or remove this line
+    "noUnusedParameters": false // Set to false or remove this line
+  }
 }

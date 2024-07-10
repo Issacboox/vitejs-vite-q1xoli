@@ -1,14 +1,14 @@
 import { ActionType, CartItem } from '../types';
 import { Action } from './actions';
 
-
 export const initialState: CartItem[] = [];
 
 const cartReducer = (
   state: CartItem[] = initialState,
   action: Action
 ): CartItem[] => {
-  let newState;
+  let newState: CartItem[];
+
   switch (action.type) {
     case ActionType.ADD_TO_CART:
       const existingItem = state.find((item) => item.id === action.payload.id);
@@ -23,10 +23,6 @@ const cartReducer = (
       }
       break;
 
-    case ActionType.REMOVE_FROM_CART:
-      newState = state.filter((item) => item.id !== action.payload);
-      break;
-
     case ActionType.UPDATE_QUANTITY:
       newState = state.map((item) =>
         item.id === action.payload.id
@@ -35,22 +31,17 @@ const cartReducer = (
       );
       break;
 
+    case ActionType.REMOVE_FROM_CART:
+      newState = state.filter((item) => item.id !== action.payload);
+      break;
+
     case ActionType.CLEAR_CART:
       newState = [];
       break;
 
-    case ActionType.UNDO:
-      // Handle undo action
-      newState = state; // Placeholder, replace with actual logic
-      break;
-
-    case ActionType.REDO:
-      // Handle redo action
-      newState = state; // Placeholder, replace with actual logic
-      break;
-
     default:
       newState = state;
+      break;
   }
 
   return newState;

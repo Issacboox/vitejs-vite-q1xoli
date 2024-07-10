@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Box,
   CssBaseline,
@@ -9,63 +8,71 @@ import {
 } from '@mui/material';
 import { theme } from './theme';
 import ShoppingCart from './components/ShoppingCart';
-import { CartItem } from './types/index';
-import useLocalStorage from './hooks/useLocalStorage';
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+
 
 function App() {
-  // Initialize cart items from localStorage or mock data
-  const [cartItems, setCartItems] = useLocalStorage<CartItem[]>('cartItems', []);
+  // // Initialize cart items from localStorage or mock data
+  // const [cartItems, setCartItems] = useLocalStorage<CartItem[]>('cartItems', []);
 
-  const addToCart = (item: CartItem) => {
-    const itemExists = cartItems.find((cartItem) => cartItem.id === item.id);
-
-    if (itemExists) {
-      const updatedCartItems = cartItems.map((cartItem) =>
-        cartItem.id === item.id
-          ? { ...cartItem, quantity: cartItem.quantity + 1 }
-          : cartItem
-      );
-      setCartItems(updatedCartItems);
-    } else {
-      setCartItems([...cartItems, { ...item, quantity: 1 }]);
-    }
-  };
-
-  const updateQuantity = (id: number, quantity: number) => {
-    const updatedCartItems = cartItems.map((item) =>
-      item.id === id ? { ...item, quantity } : item
-    );
-    setCartItems(updatedCartItems);
-  };
-
-  const removeFromCart = (id: number) => {
-    const updatedCartItems = cartItems.filter((item) => item.id !== id);
-    setCartItems(updatedCartItems);
-  };
-
+  // const addToCart = (item: Product) => {
+  //   const itemExists = cartItems.find((cartItem: CartItem) => cartItem.id === item.id);
+  
+  //   if (itemExists) {
+  //     if (itemExists.quantity < item.stock) {
+  //       const updatedCartItems = cartItems.map((cartItem: CartItem) =>
+  //         cartItem.id === item.id
+  //           ? { ...cartItem, quantity: cartItem.quantity + 1 }
+  //           : cartItem
+  //       );
+  //       setCartItems(updatedCartItems);
+  //     } else {
+  //       toast.error('Not enough stock!', {
+  //         position: 'top-right',
+  //         autoClose: 3000,
+  //         hideProgressBar: false,
+  //         closeOnClick: true,
+  //         pauseOnHover: true,
+  //         draggable: true,
+  //         progress: undefined,
+  //         style: {
+  //           fontFamily: 'JetBrains Mono, monospace',
+  //         },
+  //       });
+  //     }
+  //   } else {
+  //     setCartItems([...cartItems, { ...item, quantity: 1 }]);
+  //   }
+  // };
+  
+  // const updateQuantity = (id: number, quantity: number) => {
+  //   const updatedCartItems = cartItems.map((item: CartItem) =>
+  //     item.id === id ? { ...item, quantity } : item
+  //   );
+  //   setCartItems(updatedCartItems);
+  // };
+  
+  // const removeFromCart = (id: number) => {
+  //   const updatedCartItems = cartItems.filter((item: CartItem) => item.id !== id);
+  //   setCartItems(updatedCartItems);
+  // };
+  
   return (
     <Box sx={{ flexGrow: 1 }}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <AppBar position="sticky" color="inherit">
-          <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1, textTransform: 'uppercase', color: 'black', fontFamily: 'JetBrains Mono, monospace' }}>
-              Test Metanet
-            </Typography>
-            <Typography variant="body2" color="inherit" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-              NURARAT S. 🙋🏻‍♀️
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Box sx={{ my: 4, padding: '20px', fontFamily: 'JetBrains Mono, monospace' }}>
-          <ShoppingCart
-            items={cartItems}
-            addToCart={addToCart}
-            updateQuantity={updateQuantity}
-            removeFromCart={removeFromCart}
-          />
+        <AppBar position="sticky" color="inherit" elevation={0}>
+      <Toolbar>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1, textTransform: 'uppercase', color: 'black', fontFamily: 'JetBrains Mono, monospace' }}>
+          Test Metanet
+        </Typography>
+        <Typography variant="body2" color="inherit" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+          NURARAT S. 🙋🏻‍♀️
+        </Typography>
+      </Toolbar>
+    </AppBar>
+        <Box sx={{ my: 4, fontFamily: 'JetBrains Mono, monospace' }}>
+          <ShoppingCart/>
           <Box sx={{ mt: 'auto', pt: 4, textAlign: 'center' }}>
             <Typography variant="body2" color="textSecondary" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
               NURARAT S. 🙋🏻‍♀️

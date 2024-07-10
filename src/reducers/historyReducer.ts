@@ -1,13 +1,15 @@
-import { ActionType, CartItem } from '../types';
+import { Product, ActionType, CartItem } from '../types/index';
 import { Action } from './actions';
 
 export interface HistoryState {
   past: CartItem[][];
+  present: CartItem[];
   future: CartItem[][];
 }
 
 export const initialHistoryState: HistoryState = {
   past: [],
+  present: [],
   future: [],
 };
 
@@ -19,26 +21,24 @@ const historyReducer = (
     case ActionType.ADD_TO_CART:
     case ActionType.REMOVE_FROM_CART:
     case ActionType.UPDATE_QUANTITY:
-      // Push current state to past
       return {
-        past: [...state.past, state.future],
+        past: [...state.past, state.present],
+        present: action.payload ? [...state.present] : state.present,
         future: [],
       };
 
-    case ActionType.UNDO:
-      // Move last past state to future and set as new present
-      const [newPresent, ...newPast] = state.past;
+    case ActionType.CLEAR_CART:
       return {
-        past: newPast,
-        future: [state.present, ...state.future],
+        past: [...state.past, state.present],
+        present: [],
+        future: [],
       };
 
-    case ActionType.REDO:
-      // Move last future state to past and set as new present
-      const [newFuture, ...newFuturePast] = state.future;
+    case ActionType.INIT_CART_FROM_LOCAL_STORAGE:
       return {
-        past: [state.present, ...state.past],
-        future: newFuture,
+        past: [],
+        present: action.payload,
+        future: [],
       };
 
     default:
